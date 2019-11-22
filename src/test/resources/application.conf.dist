@@ -1,0 +1,25 @@
+scan {
+  reportName = "Example_Report_Name"
+  contextName = "vol"
+}
+
+call = ["get","post", "put"]
+
+api {
+  # These are required
+  baseURL = "https://abc.co.uk"
+  apiKey = "azAZ09"
+  resources = ["1", "2"]
+
+  # These are option, only populate if you are making a PUT and/or GET call
+  payload {
+    post {
+      "name": "example",
+      "title": "sir"
+    },
+    put {
+      "name": "example1",
+      "title": "mr"
+    }
+  }
+}
