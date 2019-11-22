@@ -1,4 +1,4 @@
-# Functional Tests
+# Description
 This project is an example of how you can security scan an API
 
 ## Prerequisite 
@@ -13,4 +13,4 @@ The following technologies should be installed on your system.
 
 
 ## NOTE
-ZAP needs to be instantiated before executing the test
+ZAP needs to be instantiated before executing the test. To download ZAP use the following link https://github.com/zaproxy/zaproxy/wiki/Downloads
