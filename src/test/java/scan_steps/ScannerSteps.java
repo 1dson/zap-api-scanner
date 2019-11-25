@@ -7,6 +7,7 @@ import com.typesafe.config.ConfigRenderOptions;
 import io.restassured.response.ValidatableResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.After;
 import org.junit.Test;
 import org.zaproxy.clientapi.core.ClientApiException;
 import scanner.ScannerMethods;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ScannerSteps {
-
 
 
     private static final Logger LOGGER = LogManager.getLogger(ScannerSteps.class);
@@ -35,12 +35,14 @@ public class ScannerSteps {
 
     private List<String> resources = config.getStringList("api.resources");
     private List<String> calls = config.getStringList("api.call");
+    private List<String> policies = config.getStringList("scan.policies");
 
     //ConfigRenderOptions.concise() parses an object into JSON
     private Object putPayLoad = config.root().toConfig().getObject("api.payload.put").render(ConfigRenderOptions.concise());
     private Object postPayLoad = config.root().toConfig().getObject("api.payload.post").render(ConfigRenderOptions.concise());
 
     private Map<String, String> requestKey = new HashMap<>();
+
     {
         requestKey.put("x-api-key", config.getString("api.apiKey"));
     }
@@ -52,75 +54,55 @@ public class ScannerSteps {
             for (String call : calls) {
                 switch (call) {
                     case "get":
-                        scanGETendPoint();
-                        break;
                     case "put":
-                        scanPUTendPoint();
-                        break;
                     case "post":
-                        scanPOSTendPoint();
+                        scanEndPoints();
                         break;
                     default:
                         throw new Exception("call not supported - ONLY PUT, POST and GET are accepted");
                 }
             }
-        } else{
+        } else {
             LOGGER.info("Please make sure that the BASE URL, RESOURCES and/or CALLS are not empty");
         }
 
     }
 
-    private void scanGETendPoint() throws Exception {
-        for (String id : resources) {
-            apiResponse = RestUtils.getThroughProxy("localhost", 8090, baseURL.concat(id), requestKey);
-            try {
-                scanner.createContext(CONTEXT_NAME);
-            } catch (ClientApiException e) {
-                scanner.useExistingContext(CONTEXT_NAME);
+
+    private void scanEndPoints() throws Exception {
+        for (String verb : calls) {
+            for (String resource : resources) {
+                switch (verb) {
+                    case "get":
+                        apiResponse = RestUtils.getThroughProxy("localhost", 8090, baseURL.concat(resource), requestKey);
+                        break;
+                    case "put":
+                        apiResponse = RestUtils.putThroughProxy("localhost", 8090, putPayLoad, baseURL.concat(resource), requestKey);
+                        break;
+                    case "post":
+                        apiResponse = RestUtils.postThroughProxy("localhost", 8090, postPayLoad, baseURL.concat(resource), requestKey);
+                        break;
+                }
+                try {
+                    scanner.createContext(CONTEXT_NAME);
+                } catch (ClientApiException e) {
+                    scanner.useExistingContext(CONTEXT_NAME);
+                }
+                scanner.includeInContext(CONTEXT_NAME, baseURL);
+                scanner.enableAllPassiveScanners();
+                scanner.performSpiderCrawl(baseURL, CONTEXT_NAME);
+                for (String policy : policies) {
+                    scanner.enableActiveScannerByName(policy);
+                    scanner.setScannerAttackStrength(policy, "insane");
+                    scanner.performActiveAttack(baseURL);
+                }
             }
-            scanner.includeInContext(CONTEXT_NAME, baseURL);
-            scanner.enableAllPassiveScanners();
-            scanner.performSpiderCrawl(baseURL, CONTEXT_NAME);
-            scanner.enableActiveScannerByName("parameter-tampering");
-            scanner.setScannerAttackStrength("parameter-tampering", "insane");
-            scanner.performActiveAttack(baseURL);
+            scanner.createReport(SCAN_REPORT_NAME, baseURL);
         }
-        scanner.createReport(SCAN_REPORT_NAME, baseURL);
     }
 
-    private void scanPUTendPoint() throws Exception {
-        for (String id : resources) {
-            apiResponse = RestUtils.putThroughProxy("localhost", 8090, putPayLoad, baseURL.concat(id), requestKey);
-            try {
-                scanner.createContext(CONTEXT_NAME);
-            } catch (ClientApiException e) {
-                scanner.useExistingContext(CONTEXT_NAME);
-            }
-            scanner.includeInContext(CONTEXT_NAME, baseURL);
-            scanner.enableAllPassiveScanners();
-            scanner.performSpiderCrawl(baseURL, CONTEXT_NAME);
-            scanner.enableActiveScannerByName("parameter-tampering");
-            scanner.setScannerAttackStrength("parameter-tampering", "insane");
-            scanner.performActiveAttack(baseURL);
-        }
-        scanner.createReport(SCAN_REPORT_NAME, baseURL);
-    }
-
-    private void scanPOSTendPoint() throws Exception {
-        for (String id : resources) {
-            apiResponse = RestUtils.postThroughProxy("localhost", 8090, postPayLoad, baseURL.concat(id), requestKey);
-            try {
-                scanner.createContext(CONTEXT_NAME);
-            } catch (ClientApiException e) {
-                scanner.useExistingContext(CONTEXT_NAME);
-            }
-            scanner.includeInContext(CONTEXT_NAME, baseURL);
-            scanner.enableAllPassiveScanners();
-            scanner.performSpiderCrawl(baseURL, CONTEXT_NAME);
-            scanner.enableActiveScannerByName("parameter-tampering");
-            scanner.setScannerAttackStrength("parameter-tampering", "insane");
-            scanner.performActiveAttack(baseURL);
-        }
-        scanner.createReport(SCAN_REPORT_NAME, baseURL);
+    @After
+    public void tearDown(){
+        scanner.stopZap();
     }
 }
