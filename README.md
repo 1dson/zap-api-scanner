@@ -1,4 +1,4 @@
-# Functional Tests
+# Description
 This project is an example of how you can security scan an API
 
 ## Prerequisite 
