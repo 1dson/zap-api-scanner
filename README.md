@@ -17,7 +17,7 @@ ZAP needs to be instantiated before executing the test
 
 ## Scan Policies
 
-List of policies that can be used in scan. For more inf
+List of policies that can be used in scan.
 
 |                            |
 |----------------------------|
