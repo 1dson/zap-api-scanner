@@ -1,6 +1,5 @@
 package utils;
 
-import com.sun.istack.internal.NotNull;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.config.SSLConfig;
 import io.restassured.http.ContentType;
@@ -14,12 +13,12 @@ public class RestUtils {
 
     private static ValidatableResponse response;
 
-    public static ValidatableResponse getThroughProxy(@NotNull String proxyURI, @NotNull int proxyPort, @NotNull String serviceEndPoint, @NotNull Map<String, String> headers) {
+    public static ValidatableResponse getThroughProxy(String proxyURI, int proxyPort, String serviceEndPoint, Map<String, String> headers) {
         response = given()
                 .urlEncodingEnabled(true)
                 .log().all()
                 .headers(headers)
-                .proxy(proxyURI,proxyPort)
+                .proxy(proxyURI, proxyPort)
                 .when().config(RestAssuredConfig.config().sslConfig(new SSLConfig().relaxedHTTPSValidation().allowAllHostnames()))
                 .get(serviceEndPoint)
                 .then();
@@ -27,13 +26,13 @@ public class RestUtils {
     }
 
 
-    public static ValidatableResponse postThroughProxy(@NotNull String proxyURI,@NotNull int proxyPort,@NotNull Object requestBody, @NotNull String serviceEndPoint, @NotNull Map<String, String> headers) {
+    public static ValidatableResponse postThroughProxy(String proxyURI, int proxyPort, Object requestBody, String serviceEndPoint, Map<String, String> headers) {
         response = given()
                 .urlEncodingEnabled(true)
                 .log().all()
                 .contentType(ContentType.JSON)
                 .headers(headers)
-                .proxy(proxyURI,proxyPort)
+                .proxy(proxyURI, proxyPort)
                 .body(requestBody)
                 .when().config(RestAssuredConfig.config().sslConfig(new SSLConfig().relaxedHTTPSValidation().allowAllHostnames()))
                 .post(serviceEndPoint)
@@ -41,13 +40,13 @@ public class RestUtils {
         return response;
     }
 
-    public static ValidatableResponse putThroughProxy(@NotNull String proxyURI,@NotNull int proxyPort, @NotNull Object requestBody, @NotNull String serviceEndPoint, @NotNull Map<String, String> headers) {
+    public static ValidatableResponse putThroughProxy(String proxyURI, int proxyPort, Object requestBody, String serviceEndPoint, Map<String, String> headers) {
         response = given()
                 .urlEncodingEnabled(true)
                 .log().all()
                 .contentType(ContentType.JSON)
                 .headers(headers)
-                .proxy(proxyURI,proxyPort)
+                .proxy(proxyURI, proxyPort)
                 .body(requestBody)
                 .when().config(RestAssuredConfig.config().sslConfig(new SSLConfig().relaxedHTTPSValidation().allowAllHostnames()))
                 .put(serviceEndPoint)
