@@ -57,7 +57,7 @@
         <repository>
             <id>github</id>
             <name>GitHub 1dson Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/1dson/SeleniumAnswerBot</url>
+            <url>https://maven.pkg.github.com/1dson/zap-api-scanner</url>
         </repository>
     </repositories>
     <!--  Nexus Configuration  -->
@@ -65,7 +65,7 @@
         <repository>
             <id>github</id>
             <name>GitHub 1dson Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/1dson/SeleniumAnswerBot</url>
+            <url>https://maven.pkg.github.com/1dson/zap-api-scanner</url>
         </repository>
     </distributionManagement>
 </project>
