@@ -3,9 +3,9 @@ This project is an example of how you can security scan an API
 
 ## Prerequisite 
 The following technologies should be installed on your system.
-* Java JDK 8
+* Java JDK 11
 * Maven 3
-* ZAP
+* ZAP docker
 
 ## Technologies
 * Java
