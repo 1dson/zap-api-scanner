@@ -60,7 +60,7 @@
             <url>https://maven.pkg.github.com/1dson/zap-api-scanner</url>
         </repository>
     </repositories>
-    <!--  Nexus Configuration  -->
+    
     <distributionManagement>
         <repository>
             <id>github</id>
